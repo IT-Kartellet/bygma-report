@@ -277,7 +277,7 @@ if (!$csv) {
 print html_writer::tag('th', get_string('table_header_passed', 'report_bygma'), array('class' => 'completion-identifyfield', 'scope' => 'col'));
 
 //Grade Header
-print html_writer::tag('th', get_string('table_header_score', 'report_bygma'), array('class' => 'completion-identifyfield', 'scope' => 'col'));
+print html_writer::tag('th', get_string('table_aggregation_passed_percentage', 'report_bygma'), array('class' => 'completion-identifyfield', 'scope' => 'col'));
 
 if ($csv) {
     print $line;
@@ -332,7 +332,7 @@ foreach($progress as $user) {
         // Get progress information and state
         if (array_key_exists($activity->id, $user->progress)) {
             $thisprogress = $user->progress[$activity->id];
-            if ($thisprogress->completionstate == COMPLETION_COMPLETE) {
+            if ($thisprogress->completionstate == COMPLETION_COMPLETE || $thisprogress->completionstate == COMPLETION_COMPLETE_PASS) {
                 $count_completed++;
             }
         }
@@ -381,7 +381,7 @@ print html_writer::end_tag('tr');
 
 print html_writer::start_tag('tr');
 print html_writer::tag('th', get_string('table_aggregation_average_grade', 'report_bygma'), array('class' => 'completion-identifyfield'));
-print html_writer::tag('td', '', array('class' => 'completion-progresscell'));
+print html_writer::tag('td', (calculate_average_grade($modules_info, $grandtotal) . '%'), array('class' => 'completion-progresscell'));
 print html_writer::end_tag('tr');
 
 print html_writer::end_tag('table');

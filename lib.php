@@ -109,3 +109,20 @@ function resolve_completion_percentage($userid, $activities, $general_completion
         }
     }
 }
+
+function calculate_average_grade($modules_info, $user_count){
+    $grade_count = 0;
+    $activity_count = 0;
+
+    foreach($modules_info as $module_type){
+        foreach($module_type as $module_instance){
+            if(!empty($module_instance->items)){
+                $activity_count++;
+                foreach($module_instance->items[0]->grades as $grade_info){
+                    $grade_count += floatval($grade_info->grade);
+                }
+            }
+        }
+    }
+    return ($grade_count / ($user_count * $activity_count)) * 10;
+}
