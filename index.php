@@ -362,7 +362,7 @@ $total_completed = $DB->get_record_sql('SELECT count(DISTINCT cmc.userid) as cou
 
 $average_grade = $DB->get_record_sql("SELECT ROUND(SUM(gg.rawgrade) / SUM(gi.grademax) * 100, 0) as average
                 FROM {grade_items} gi JOIN {grade_grades} gg ON gg.itemid = gi.id
-                WHERE courseid = 2 AND gi.itemtype = :itemtype", array('itemtype' => 'mod'));
+                WHERE courseid = :courseid AND gi.itemtype = :itemtype", array('courseid' => $course->id, 'itemtype' => 'mod'));
 
 print html_writer::start_tag('table', array('class' => 'table-aggregation generaltable flexible boxaligncenter'));
 
