@@ -297,9 +297,6 @@ foreach($activities as $activity){
     }
 }
 
-//Total number of users who completed the whole course
-$total_users_completed = 0;
-
 // Row for each user
 foreach($progress as $user) {
 
@@ -338,10 +335,6 @@ foreach($progress as $user) {
         }
     }
 
-    if($count_completed == $count_total){
-        $total_users_completed++;
-    }
-
     //Passed - whether user passed or not
     print html_writer::tag('td', $count_completed == $count_total ? get_string('yes') : get_string('no'), array('completion-progresscell'));
 
@@ -362,6 +355,15 @@ print '</tbody></table>';
 print '</div>';
 print $pagingbar;
 
+$total_completed = $DB->get_record_sql('SELECT count(DISTINCT cmc.userid) as count_completed
+                FROM {course_modules} cm
+                INNER JOIN {course_modules_completion} cmc ON cm.id=cmc.coursemoduleid
+                WHERE cm.course = :courseid AND cmc.completionstate = :completionstate', array('courseid' => $course->id, 'completionstate' => 1));
+
+$average_grade = $DB->get_record_sql("SELECT ROUND(SUM(gg.rawgrade) / SUM(gi.grademax) * 100, 0) as average
+                FROM {grade_items} gi JOIN {grade_grades} gg ON gg.itemid = gi.id
+                WHERE courseid = 2 AND gi.itemtype = :itemtype", array('itemtype' => 'mod'));
+
 print html_writer::start_tag('table', array('class' => 'table-aggregation generaltable flexible boxaligncenter'));
 
 print html_writer::start_tag('tr');
@@ -371,17 +373,17 @@ print html_writer::end_tag('tr');
 
 print html_writer::start_tag('tr');
 print html_writer::tag('th', get_string('table_aggregation_users_passed', 'report_bygma'), array('class' => 'completion-identifyfield'));
-print html_writer::tag('td', $total_users_completed, array('class' => 'completion-progresscell'));
+print html_writer::tag('td', $total_completed->count_completed, array('class' => 'completion-progresscell'));
 print html_writer::end_tag('tr');
 
 print html_writer::start_tag('tr');
 print html_writer::tag('th', get_string('table_aggregation_passed_percentage', 'report_bygma'), array('class' => 'completion-identifyfield'));
-print html_writer::tag('td', (round($total_users_completed / $grandtotal * 100)) . '%', array('class' => 'completion-progresscell'));
+print html_writer::tag('td', (round($total_completed->count_completed / $grandtotal * 100)) . '%', array('class' => 'completion-progresscell'));
 print html_writer::end_tag('tr');
 
 print html_writer::start_tag('tr');
 print html_writer::tag('th', get_string('table_aggregation_average_grade', 'report_bygma'), array('class' => 'completion-identifyfield'));
-print html_writer::tag('td', (calculate_average_grade($modules_info, $grandtotal) . '%'), array('class' => 'completion-progresscell'));
+print html_writer::tag('td', "{$average_grade->average}%", array('class' => 'completion-progresscell'));
 print html_writer::end_tag('tr');
 
 print html_writer::end_tag('table');
