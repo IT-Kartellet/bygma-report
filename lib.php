@@ -118,11 +118,15 @@ function calculate_average_grade($modules_info, $user_count){
         foreach($module_type as $module_instance){
             if(!empty($module_instance->items)){
                 $activity_count++;
+                $grade_max = floatval($module_instance->items[0]->grademax - $module_instance->items[0]->grademin);
                 foreach($module_instance->items[0]->grades as $grade_info){
-                    $grade_count += floatval($grade_info->grade);
+                    if(!is_null($grade_info->grade)){
+                        $grade_perc = $grade_max / $grade_info->grade * 100;
+                        $grade_count += floatval($grade_perc);
+                    }
                 }
             }
         }
     }
-    return ($grade_count / ($user_count * $activity_count)) * 10;
+    return ($grade_count / ($user_count * $activity_count));
 }
